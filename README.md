@@ -32,15 +32,6 @@ It is recommended that you install Golang using your system's package manager. I
 brew update && brew install golang
 ```
 
-### Glide
-
-Golang dependencies are managed with [Glide]. You should install them before compiling this project.
-
-```bash
-curl https://glide.sh/get | sh
-glide install
-```
-
 ### GoMetaLinter
 
 [GoMetaLinter] pulls together many popular linting tools, and can run them on a project.
