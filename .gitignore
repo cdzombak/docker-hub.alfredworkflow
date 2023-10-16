@@ -1,3 +1,4 @@
 bin/
 docker-hub/
 vendor/
+.idea/
