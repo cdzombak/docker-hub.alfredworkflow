@@ -10,9 +10,14 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 
-	// "github.com/davecgh/go-spew/spew"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/parnurzeal/gorequest"
+)
+
+const (
+	EnvVarDebug = "DEBUG"
 )
 
 var (
@@ -94,7 +99,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// spew.Dump(doc)
+	if isTruthy(os.Getenv(EnvVarDebug)) {
+		spew.Dump(doc)
+	}
 
 	// No results
 	if doc.Count == 0 {
@@ -163,4 +170,9 @@ func main() {
 	}
 
 	fmt.Println(string(output))
+}
+
+func isTruthy(s string) bool {
+	s = strings.ToLower(s)
+	return s == "true" || s == "t" || s == "yes" || s == "y" || s == "1"
 }
