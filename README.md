@@ -9,14 +9,14 @@ An Alfred PowerPack Workflow for searching Docker Hub for public Docker images.
 ### Actions
 
 `↩` — Open the module in the Docker Hub UI.  
-`⇧/⌘Y` — Quicklook details﻿
+`⇧/⌘Y` — Quicklook details
 
 ### Screenshots
 
-![](README.png)  
-![](README2.png)  
-![](README3.png)  
-![](README4.png)  
+![](readme.images/README.png)  
+![](readme.images/README2.png)  
+![](readme.images/README3.png)  
+![](readme.images/README4.png)  
 
 **[Download!](docker-hub.alfredworkflow?raw=true)** Requires [Alfred 3 and the PowerPack](https://www.alfredapp.com/powerpack/).
 
