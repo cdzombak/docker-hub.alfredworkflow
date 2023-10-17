@@ -2,57 +2,32 @@
 
 An Alfred PowerPack Workflow for searching Docker Hub for public Docker images.
 
+## Installation
+
+Download `docker-hub.alfredworkflow` from the [latest release](https://github.com/cdzombak/docker-hub.alfredworkflow/releases/latest) and double-click `docker-hub.alfredworkflow` to install it.
+
 ## Usage
 
 `dockerhub {query}` — Search for an image.
 
 ### Actions
 
-`↩` — Open the module in the Docker Hub UI.  
-`⇧/⌘Y` — Quicklook details
+- `↩` — Open the module in the Docker Hub UI
+- `⇧/⌘Y` — QuickLook details
 
-### Screenshots
+## Screenshots
 
-![](readme.images/README.png)  
-![](readme.images/README2.png)  
-![](readme.images/README3.png)  
-![](readme.images/README4.png)  
+![beginning a search](readme.images/README.png)  
+![search results](readme.images/README2.png)  
+![no results found](readme.images/README3.png)  
+![quicklook details](readme.images/README4.png)
 
-**[Download!](docker-hub.alfredworkflow?raw=true)** Requires [Alfred 3 and the PowerPack](https://www.alfredapp.com/powerpack/).
+## About
 
-## Developing/Deploying
+Maintained by [Chris Dzombak](https://www.dzombak.com) ([@cdzombak on GitHub](https://github.com/cdzombak)).
 
-### Golang
+Originally based on [skyzyx/docker-hub.alfredworkflow](https://github.com/skyzyx/docker-hub.alfredworkflow).
 
-Go (when spoken) or [Golang] (when written) is a strongly-typed language from Google that "blends the simplicity of Python with the performance of C". Static binaries can be compiled for all major platforms, and many minor ones.
+## License
 
-It is recommended that you install Golang using your system's package manager. If you don't have one (or if the version is too old), you can [install Golang from its website](https://golang.org/doc/install). Reading the [Getting Started](https://golang.org/doc/) documentation is a valuable exercise.
-
-```bash
-brew update && brew install golang
-```
-
-### GoMetaLinter
-
-[GoMetaLinter] pulls together many popular linting tools, and can run them on a project.
-
-```bash
-gometalinter.v2 --install
-```
-
-### Developing
-
-```bash
-make build
-bin/dockerhub "golang"
-```
-
-Make sure that you run the linter to catch any issues.
-
-```bash
-make lint
-```
-
-  [Glide]: https://glide.sh
-  [Golang]: https://golang.org
-  [GoMetaLinter]: https://github.com/alecthomas/gometalinter
+BSD 2-clause; see LICENSE in this repository.

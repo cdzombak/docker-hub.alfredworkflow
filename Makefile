@@ -1,65 +1,48 @@
-all:
-	@cat Makefile | grep : | grep -v PHONY | grep -v @ | sed 's/:/ /' | awk '{print $$1}' | sort
+SHELL:=/usr/bin/env bash
+VERSION:=$(shell ./.version.sh)
 
-#-------------------------------------------------------------------------------
+default: help
+.PHONY: help  # via https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+help: ## Print help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: install-deps
-install-deps:
-	glide install && gometalinter.v2 --install
+.PHONY: all
+all: package
+
+.PHONY: clean
+clean: ## Remove all build outputs
+	rm -rf .pkg
+	rm -rf out
 
 .PHONY: build
-build:
-	go build -ldflags="-s -w" -o bin/dockerhub main.go
-
-.PHONY: lint
-lint:
-	gometalinter.v2 ./main.go
+build: clean ## Build the dockerhub binary
+	mkdir -p out
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./out/dockerhub-amd64 main.go
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o ./out/dockerhub-arm64 main.go
+	lipo -create -output ./out/dockerhub ./out/dockerhub-amd64 ./out/dockerhub-arm64
 
 .PHONY: package
-package: build
-	upx --brute bin/dockerhub
-	mkdir -p docker-hub
-	rm -Rf docker-hub
-	mkdir -p docker-hub
-	cp -rv bin docker-hub/
-	cp -v *.png docker-hub/
-	cp -v *.plist docker-hub/
-	cd docker-hub/ && \
-		zip -r docker-hub.zip * && \
-		mv -v docker-hub.zip ../docker-hub.alfredworkflow
+package: build ## Build and package the workflow for distribution
+	rm -rf ./.pkg
+	mkdir -p ./out
+	mkdir -p ./.pkg/bin
+	cp -v ./out/dockerhub ./.pkg/bin/dockerhub
+	ln ./images/hub.png ./.pkg/FEBEA35B-0996-4DFB-9F9A-4049E7F5D678.png
+	ln ./images/hub.png ./.pkg/hub.png
+	ln ./images/hub.png ./.pkg/icon.png
+	ln ./images/verified.png ./.pkg/verified.png
+	ln ./images/not-verified.png ./.pkg/not-verified.png
+	cp -v ./workflow/info.plist ./.pkg/info.plist
+	sed -i '' -e 's/__WORKFLOW_VERSION__/${BIN_VERSION}/g' ./.pkg/info.plist
+	pushd ./.pkg
+	zip -r workflow.zip *
+	mv -v workflow.zip ../out/docker-hub-${BIN_VERSION}.alfredworkflow
+	popd
 
-#-------------------------------------------------------------------------------
+.PHONY: lint
+lint: ## Lint all source files in this repository (requires nektos/act: https://nektosact.com)
+	act --artifact-server-path /tmp/artifacts -j lint
 
-.PHONY: tag
-tag:
-	@ if [ $$(git status -s -uall | wc -l) != 1 ]; then echo 'ERROR: Git workspace must be clean.'; exit 1; fi;
-
-	@echo "This release will be tagged as: $$(cat ./VERSION)"
-	@echo "This version should match your release. If it doesn't, re-run 'make version'."
-	@echo "---------------------------------------------------------------------"
-	@read -p "Press any key to continue, or press Control+C to cancel. " x;
-
-	@echo " "
-	@chag update $$(cat ./VERSION)
-	@echo " "
-
-	@echo "These are the contents of the CHANGELOG for this release. Are these correct?"
-	@echo "---------------------------------------------------------------------"
-	@chag contents
-	@echo "---------------------------------------------------------------------"
-	@echo "Are these release notes correct? If not, cancel and update CHANGELOG.md."
-	@read -p "Press any key to continue, or press Control+C to cancel. " x;
-
-	@echo " "
-
-	git add .
-	git commit -a -m "Preparing the $$(cat ./VERSION) release."
-	chag tag --sign
-
-#-------------------------------------------------------------------------------
-
-.PHONY: version
-version:
-	@echo "Current version: $$(cat ./VERSION)"
-	@read -p "Enter new version number: " nv; \
-	printf "$$nv" > ./VERSION
+.PHONY: update-lint
+update-lint: ## Pull updated images supporting the lint target (may fetch >10 GB!)
+	docker pull catthehacker/ubuntu:full-latest

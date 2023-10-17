@@ -1,4 +1,4 @@
-bin/
-docker-hub/
+.pkg/
+out/
 vendor/
 .idea/
