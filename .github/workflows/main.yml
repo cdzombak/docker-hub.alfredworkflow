@@ -109,15 +109,23 @@ jobs:
           DEVID_SIGNING_CERT_ID: E96F32F4C62CDE44BD2F9F7040F8D3C9EBEDD5B4
           KEYCHAIN_PASS: ${{ secrets.KEYCHAIN_PASS }}
         run: |
-          echo "$DEVID_SIGNING_CERT_BASE64" | base64 --decode > certificate.p12
           security create-keychain -p "$KEYCHAIN_PASS" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASS" build.keychain
+          echo "$DEVID_SIGNING_CERT_BASE64" | base64 --decode > certificate.p12
           security import certificate.p12 -k build.keychain -P "$DEVID_SIGNING_CERT_PASS" -T /usr/bin/codesign
+          rm certificate.p12
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASS" build.keychain
           /usr/bin/codesign --force --timestamp --options=runtime -s "$DEVID_SIGNING_CERT_ID" ./dockerhub -v
       - name: Build workflow
         run: make package
+      - name: Cleanup intermediate dockerhub binary
+        working-directory: out
+        run: rm ./dockerhub
+      - name: Create .dmg for notarization and distribution
+        run: |
+          hdiutil create "${{ needs.meta.outputs.bin_name }}.dmg" -srcfolder ./out/
+          mv "${{ needs.meta.outputs.bin_name }}.dmg" ./out/
       - name: Notarize workflow
         working-directory: out
         env:
@@ -129,12 +137,13 @@ jobs:
             --apple-id "$NOTARIZATION_APPLE_ID" \
             --team-id "$NOTARIZATION_TEAM_ID" \
             --password "$NOTARIZATION_PASS"
-          xcrun notarytool submit "${{ needs.meta.outputs.bin_name }}" --keychain-profile "notarytool-profile" --wait
+          xcrun notarytool submit "${{ needs.meta.outputs.bin_name }}.dmg" --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple "${{ needs.meta.outputs.bin_name }}.dmg"
       - name: Upload notarized workflow package
         uses: actions/upload-artifact@v3
         with:
           name: ${{ needs.meta.outputs.bin_name }} package
-          path: out/${{ needs.meta.outputs.bin_name }}
+          path: out/${{ needs.meta.outputs.bin_name }}.dmg
 #
 #  release:
 #    name: GitHub (Pre)Release
@@ -157,7 +166,7 @@ jobs:
 #      - name: Create GitHub release
 #        uses: softprops/action-gh-release@v1
 #        with:
-#          files: out/${{ needs.meta.outputs.bin_name }}
+#          files: out/${{ needs.meta.outputs.bin_name }}.dmg
 #          prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
 #          fail_on_unmatched_files: true
 #          generate_release_notes: true

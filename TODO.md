@@ -1,5 +1,4 @@
 # TODO
 
-- [ ] Test GHA build product
-- [ ] Can I ship the .alfredworkflow in a .pkg or some other signed structure, or otherwise sign the `hub` binary?
+- [ ] Cleanup in_name, .dmg, and bin_version in GHA workflow
 - [ ] GitHub CI for release

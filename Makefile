@@ -22,7 +22,7 @@ build: ## Build the dockerhub binary
 	lipo -create -output ./out/dockerhub ./out/dockerhub-amd64 ./out/dockerhub-arm64
 
 .PHONY: package
-package: ## Build and package the workflow for distribution
+package: ## Package the workflow for distribution
 	rm -rf ./.pkg
 	mkdir -p ./.pkg/bin
 	cp -v ./out/dockerhub ./.pkg/bin/dockerhub

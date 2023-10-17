@@ -4,7 +4,7 @@ An Alfred PowerPack Workflow for searching Docker Hub for public Docker images.
 
 ## Installation
 
-Download `docker-hub.alfredworkflow` from the [latest release](https://github.com/cdzombak/docker-hub.alfredworkflow/releases/latest) and double-click `docker-hub.alfredworkflow` to install it.
+Download the `.dmg` file from the [latest release](https://github.com/cdzombak/docker-hub.alfredworkflow/releases/latest), open the downloaded `.dmg` file, and double-click the `.alfredworkflow` file to install it.
 
 ## Usage
 
@@ -31,7 +31,8 @@ Originally based on [skyzyx/docker-hub.alfredworkflow](https://github.com/skyzyx
 Principal changes in @cdzombak's fork:
 - Use Go Modules for dependency management
 - Use GitHub Actions for the build & release process
-- Codesign the embedded `dockerhub` binary
+- Codesign the embedded `dockerhub` binary for distribution outside the Mac App Store
+- Notarize the workflow for distribution
 
 ## License
 
