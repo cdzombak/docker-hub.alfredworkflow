@@ -8,7 +8,7 @@ Download `docker-hub-VERSION.alfredworkflow.dmg` from the [latest release](https
 
 ## Usage
 
-`dockerhub {query}` — Search for an image.
+`hub {query}` — Search for an image.
 
 ### Actions
 
