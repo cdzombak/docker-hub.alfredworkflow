@@ -108,11 +108,11 @@ jobs:
           DEVID_SIGNING_CERT_PASS: ${{ secrets.DEVID_SIGNING_CERT_PASS }}
           KEYCHAIN_PASS: ${{ secrets.KEYCHAIN_PASS }}
         run: |
-          echo "DEVID_SIGNING_CERT_BASE64" | base64 --decode -o certificate.p12
+          echo "$DEVID_SIGNING_CERT_BASE64" | base64 --decode > certificate.p12
           security create-keychain -p "$KEYCHAIN_PASS" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASS" build.keychain
-          security import certificate.p12 -k build.keychain -P "DEVID_SIGNING_CERT_PASS" -T /usr/bin/codesign
+          security import certificate.p12 -k build.keychain -P "$DEVID_SIGNING_CERT_PASS" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASS" build.keychain
           /usr/bin/codesign --force -s E96F32F4C62CDE44BD2F9F7040F8D3C9EBEDD5B4 ./dockerhub -v
       - name: Build workflow package
