@@ -28,6 +28,10 @@ Maintained by [Chris Dzombak](https://www.dzombak.com) ([@cdzombak on GitHub](ht
 
 Originally based on [skyzyx/docker-hub.alfredworkflow](https://github.com/skyzyx/docker-hub.alfredworkflow).
 
+Principal changes in @cdzombak's fork:
+- Use Go Modules for dependency management
+- Use GitHub Actions for the build & release process
+
 ## License
 
 BSD 2-clause; see LICENSE in this repository.
