@@ -98,6 +98,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Build dockerhub binary
+        run: make build
+      - name: Sign dockerhub binary
+        working-directory: out
+        env:
+          DEVID_SIGNING_CERT_BASE64: ${{ secrets.DEVID_SIGNING_CERT }}
+          DEVID_SIGNING_CERT_PASS: ${{ secrets.DEVID_SIGNING_CERT_PASS }}
+          KEYCHAIN_PASS: ${{ secrets.KEYCHAIN_PASS }}
+        run: |
+          echo "DEVID_SIGNING_CERT_BASE64" | base64 —d > certificate.p12
+          security create-keychain -p "$KEYCHAIN_PASS" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASS" build.keychain
+          security import certificate.p12 -k build.keychain -P "DEVID_SIGNING_CERT_PASS" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASS" build.keychain
+          /usr/bin/codesign --force -s E96F32F4C62CDE44BD2F9F7040F8D3C9EBEDD5B4 ./dockerhub -v
       - name: Build workflow package
         run: make package
       - name: Upload workflow package
@@ -105,6 +121,7 @@ jobs:
         with:
           name: ${{ needs.meta.outputs.bin_name }} package
           path: out/${{ needs.meta.outputs.bin_name }}
+#
 #  release:
 #    name: GitHub (Pre)Release
 #    needs: [meta, package]

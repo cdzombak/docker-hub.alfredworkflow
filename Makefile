@@ -15,16 +15,15 @@ clean: ## Remove all build outputs
 	rm -rf out
 
 .PHONY: build
-build: clean ## Build the dockerhub binary
+build: ## Build the dockerhub binary
 	mkdir -p out
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./out/dockerhub-amd64 main.go
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o ./out/dockerhub-arm64 main.go
 	lipo -create -output ./out/dockerhub ./out/dockerhub-amd64 ./out/dockerhub-arm64
 
 .PHONY: package
-package: build ## Build and package the workflow for distribution
+package: ## Build and package the workflow for distribution
 	rm -rf ./.pkg
-	mkdir -p ./out
 	mkdir -p ./.pkg/bin
 	cp -v ./out/dockerhub ./.pkg/bin/dockerhub
 	ln ./images/hub.png ./.pkg/FEBEA35B-0996-4DFB-9F9A-4049E7F5D678.png
@@ -34,6 +33,7 @@ package: build ## Build and package the workflow for distribution
 	ln ./images/not-verified.png ./.pkg/not-verified.png
 	cp -v ./workflow/info.plist ./.pkg/info.plist
 	sed -i '' -e 's/__WORKFLOW_VERSION__/${VERSION}/g' ./.pkg/info.plist
+	mkdir -p ./out
 	cd ./.pkg && zip -r workflow.zip * && mv -v workflow.zip ../out/docker-hub-${VERSION}.alfredworkflow
 
 .PHONY: lint

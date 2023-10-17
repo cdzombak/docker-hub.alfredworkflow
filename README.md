@@ -31,6 +31,7 @@ Originally based on [skyzyx/docker-hub.alfredworkflow](https://github.com/skyzyx
 Principal changes in @cdzombak's fork:
 - Use Go Modules for dependency management
 - Use GitHub Actions for the build & release process
+- Codesign the embedded `dockerhub` binary
 
 ## License
 
