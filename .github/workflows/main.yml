@@ -92,7 +92,7 @@ jobs:
 
   package:
     name: Workflow Package
-#    needs: [lint, meta]
+    #    needs: [lint, meta]
     needs: [meta]
     if: needs.meta.outputs.is_running_version_tag_update != 'true'
     runs-on: macos-12
@@ -126,7 +126,7 @@ jobs:
           cp ${{ needs.meta.outputs.bin_name }} ./.dmg-src/
           hdiutil create -srcfolder ./.dmg-src \
             -fs "HFS+" \
-            -volname "docker-hub.alfredworkflow" \
+            -volname "${{ needs.meta.outputs.bin_name }}" \
             ./${{ needs.meta.outputs.bin_name }}.dmg
           hdiutil verify ./${{ needs.meta.outputs.bin_name }}.dmg
       - name: Notarize workflow
@@ -147,46 +147,46 @@ jobs:
         with:
           name: ${{ needs.meta.outputs.bin_name }} package
           path: out/${{ needs.meta.outputs.bin_name }}.dmg
-#
-#  release:
-#    name: GitHub (Pre)Release
-#    needs: [meta, package]
-#    if: >-
-#      needs.meta.outputs.is_release == 'true' ||
-#      needs.meta.outputs.is_prerelease == 'true'
-#    runs-on: ubuntu-latest
-#    permissions:
-#      contents: write
-#    steps:
-#      - name: Download workflow package
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: ${{ needs.meta.outputs.bin_name }} package
-#          path: out
-#      - name: List artifacts
-#        working-directory: out
-#        run: ls -R
-#      - name: Create GitHub release
-#        uses: softprops/action-gh-release@v1
-#        with:
-#          files: out/${{ needs.meta.outputs.bin_name }}.dmg
-#          prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
-#          fail_on_unmatched_files: true
-#          generate_release_notes: true
-#
-#  tags:
-#    name: Update Release Tags
-#    needs: [meta, release]
-#    if: needs.meta.outputs.is_release == 'true'
-#    runs-on: ubuntu-latest
-#    permissions:
-#      contents: write
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#      - name: Update running major/minor version tags
-#        uses: sersoft-gmbh/running-release-tags-action@v3
-#        with:
-#          fail-on-non-semver-tag: true
-#          create-release: false
-#          update-full-release: false
+
+  release:
+    name: GitHub (Pre)Release
+    needs: [meta, package]
+    if: >-
+      needs.meta.outputs.is_release == 'true' ||
+      needs.meta.outputs.is_prerelease == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download workflow package
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.meta.outputs.bin_name }} package
+          path: out
+      - name: List artifacts
+        working-directory: out
+        run: ls -R
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: out/${{ needs.meta.outputs.bin_name }}.dmg
+          prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+
+  tags:
+    name: Update Release Tags
+    needs: [meta, release]
+    if: needs.meta.outputs.is_release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Update running major/minor version tags
+        uses: sersoft-gmbh/running-release-tags-action@v3
+        with:
+          fail-on-non-semver-tag: true
+          create-release: false
+          update-full-release: false

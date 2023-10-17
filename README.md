@@ -4,7 +4,7 @@ An Alfred PowerPack Workflow for searching Docker Hub for public Docker images.
 
 ## Installation
 
-Download the `.dmg` file from the [latest release](https://github.com/cdzombak/docker-hub.alfredworkflow/releases/latest), open the downloaded `.dmg` file, and double-click the `.alfredworkflow` file to install it.
+Download `docker-hub-VERSION.alfredworkflow.dmg` from the [latest release](https://github.com/cdzombak/docker-hub.alfredworkflow/releases/latest), open the downloaded `.dmg` file, and double-click the `.alfredworkflow` file to install it.
 
 ## Usage
 
