@@ -51,7 +51,7 @@ type AlfredItem struct {
 	Arg          string `json:"arg,omitempty"`
 	Autocomplete string `json:"autocomplete,omitempty"`
 	Match        string `json:"match,omitempty"`
-	QuicklookUrl string `json:"quicklookurl,omitempty"`
+	QuicklookURL string `json:"quicklookurl,omitempty"`
 	Subtitle     string `json:"subtitle,omitempty"`
 	Title        string `json:"title,omitempty"`
 	Type         string `json:"type,omitempty"`
@@ -82,7 +82,7 @@ type AlfredModifierKeys struct {
 type AlfredModifierKey struct {
 	Arg          string `json:"arg,omitempty"`
 	Subtitle     string `json:"subtitle,omitempty"`
-	QuicklookUrl string `json:"quicklookurl,omitempty"`
+	QuicklookURL string `json:"quicklookurl,omitempty"`
 	Valid        bool   `json:"valid,omitempty"`
 }
 
@@ -117,7 +117,7 @@ func main() {
 
 	// Results
 	for _, result := range doc.Results {
-		regUrl := fmt.Sprintf(
+		regURL := fmt.Sprintf(
 			"https://hub.docker.com/%s",
 			map[bool]string{
 				true:  fmt.Sprintf("_/%s", result.RepoName),
@@ -129,8 +129,8 @@ func main() {
 			UID:          result.RepoName,
 			Title:        result.RepoName,
 			Subtitle:     result.ShortDescription,
-			Arg:          regUrl,
-			QuicklookUrl: regUrl,
+			Arg:          regURL,
+			QuicklookURL: regURL,
 			Valid:        true,
 			Type:         "default",
 			// Autocomplete string `json:"autocomplete,omitempty"`
@@ -145,7 +145,7 @@ func main() {
 			},
 			Mods: AlfredModifierKeys{
 				Alt: AlfredModifierKey{
-					Arg: regUrl,
+					Arg: regURL,
 					Subtitle: fmt.Sprintf(
 						"%d %s • %d %s • %s",
 						result.StarCount,
@@ -154,7 +154,7 @@ func main() {
 						map[bool]string{true: "pull", false: "pulls"}[result.PullCount == 1],
 						map[bool]string{true: "Automated", false: "Not Automated"}[result.IsAutomated],
 					),
-					QuicklookUrl: regUrl,
+					QuicklookURL: regURL,
 					Valid:        true,
 				},
 			},

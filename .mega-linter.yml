@@ -3,7 +3,6 @@
 VALIDATE_ALL_CODEBASE: true
 
 DISABLE:
-  - GO
   - REPOSITORY
   - SPELL
 DISABLE_LINTERS:
@@ -11,6 +10,8 @@ DISABLE_LINTERS:
 
 PLUGINS:
   - https://raw.githubusercontent.com/cdzombak/mega-linter-plugin-dockerfilelint/main/mega-linter-plugin-dockerfilelint/dockerfilelint.megalinter-descriptor.yml
+
+GO_REVIVE_CONFIG_FILE: ".revive.toml"
 
 SHOW_ELAPSED_TIME: false
 FILEIO_REPORTER: false
