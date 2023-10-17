@@ -107,7 +107,7 @@ jobs:
           DEVID_SIGNING_CERT_PASS: ${{ secrets.DEVID_SIGNING_CERT_PASS }}
           KEYCHAIN_PASS: ${{ secrets.KEYCHAIN_PASS }}
         run: |
-          echo "DEVID_SIGNING_CERT_BASE64" | base64 —d > certificate.p12
+          echo "DEVID_SIGNING_CERT_BASE64" | base64 --decode -o certificate.p12
           security create-keychain -p "$KEYCHAIN_PASS" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASS" build.keychain
