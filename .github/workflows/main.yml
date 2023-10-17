@@ -123,9 +123,7 @@ jobs:
         run: |
           mkdir ./.dmg-src
           cp ${{ needs.meta.outputs.bin_name }} ./.dmg-src/
-          hdiutil create -srcfolder ./.dmg-src \
-            -volname "${{ needs.meta.outputs.bin_name }}" \
-            -format UDIF -nospotlight \
+          hdiutil create -srcfolder ./.dmg-src -format UDIF \
             ./${{ needs.meta.outputs.bin_name }}.dmg
       - name: Notarize workflow
         working-directory: out
