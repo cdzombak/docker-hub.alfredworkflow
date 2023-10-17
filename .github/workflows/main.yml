@@ -122,9 +122,13 @@ jobs:
         working-directory: out
         run: |
           mkdir ./.dmg-src
+          xattr -cr ./.dmg-src
           cp ${{ needs.meta.outputs.bin_name }} ./.dmg-src/
-          hdiutil create -srcfolder ./.dmg-src -format UDIF \
+          hdiutil create -srcfolder ./.dmg-src \
+            -fs "HFS+" \
+            -volname "docker-hub.alfredworkflow" \
             ./${{ needs.meta.outputs.bin_name }}.dmg
+          hdiutil verify ./${{ needs.meta.outputs.bin_name }}.dmg
       - name: Notarize workflow
         working-directory: out
         env:
