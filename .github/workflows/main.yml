@@ -114,11 +114,19 @@ jobs:
           security unlock-keychain -p "$KEYCHAIN_PASS" build.keychain
           echo "$DEVID_SIGNING_CERT_BASE64" | base64 --decode > certificate.p12
           security import certificate.p12 -k build.keychain -P "$DEVID_SIGNING_CERT_PASS" -T /usr/bin/codesign
-          rm certificate.p12
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASS" build.keychain
           /usr/bin/codesign --force --timestamp --options=runtime -s "$DEVID_SIGNING_CERT_ID" ./dockerhub -v
       - name: Build workflow
         run: make package
+      - name: Create .dmg
+        working-directory: out
+        run: |
+          mkdir ./.dmg-src
+          cp ${{ needs.meta.outputs.bin_name }} ./.dmg-src/
+          hdiutil create -srcfolder ./.dmg-src \
+            -volname "${{ needs.meta.outputs.bin_name }}" \
+            -format UDIF -nospotlight \
+            ./${{ needs.meta.outputs.bin_name }}.dmg
       - name: Notarize workflow
         working-directory: out
         env:
@@ -130,18 +138,8 @@ jobs:
             --apple-id "$NOTARIZATION_APPLE_ID" \
             --team-id "$NOTARIZATION_TEAM_ID" \
             --password "$NOTARIZATION_PASS"
-          xcrun notarytool submit "${{ needs.meta.outputs.bin_name }}" --keychain-profile "notarytool-profile" --wait
-      - name: Create .dmg with notary staple
-        working-directory: out
-        run: |
-          mkdir .dmg-src
-          ln "${{ needs.meta.outputs.bin_name }}" ".dmg-src/${{ needs.meta.outputs.bin_name }}"
-          hdiutil create -srcfolder .dmg-src \
-            -volname "${{ needs.meta.outputs.bin_name }}" \
-            -format UDRO -nospotlight \
-            -srcowners off -noanyowners \
-            "${{ needs.meta.outputs.bin_name }}.dmg"
-          xcrun stapler staple "${{ needs.meta.outputs.bin_name }}.dmg"
+          xcrun notarytool submit ./${{ needs.meta.outputs.bin_name }}.dmg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple ./${{ needs.meta.outputs.bin_name }}.dmg
       - name: Upload notarized workflow package
         uses: actions/upload-artifact@v3
         with:
