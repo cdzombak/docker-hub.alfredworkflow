@@ -94,7 +94,7 @@ jobs:
     name: Workflow Package
     needs: [lint, meta]
     if: needs.meta.outputs.is_running_version_tag_update != 'true'
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
