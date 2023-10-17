@@ -119,13 +119,6 @@ jobs:
           /usr/bin/codesign --force --timestamp --options=runtime -s "$DEVID_SIGNING_CERT_ID" ./dockerhub -v
       - name: Build workflow
         run: make package
-      - name: Cleanup intermediate dockerhub binary
-        working-directory: out
-        run: rm ./dockerhub
-      - name: Create .dmg for notarization and distribution
-        run: |
-          hdiutil create "${{ needs.meta.outputs.bin_name }}.dmg" -srcfolder ./out/
-          mv "${{ needs.meta.outputs.bin_name }}.dmg" ./out/
       - name: Notarize workflow
         working-directory: out
         env:
@@ -137,7 +130,17 @@ jobs:
             --apple-id "$NOTARIZATION_APPLE_ID" \
             --team-id "$NOTARIZATION_TEAM_ID" \
             --password "$NOTARIZATION_PASS"
-          xcrun notarytool submit "${{ needs.meta.outputs.bin_name }}.dmg" --keychain-profile "notarytool-profile" --wait
+          xcrun notarytool submit "${{ needs.meta.outputs.bin_name }}" --keychain-profile "notarytool-profile" --wait
+      - name: Create .dmg with notary staple
+        working-directory: out
+        run: |
+          mkdir .dmg-src
+          ln "${{ needs.meta.outputs.bin_name }}" ".dmg-src/${{ needs.meta.outputs.bin_name }}"
+          hdiutil create -srcfolder .dmg-src \
+            -volname "${{ needs.meta.outputs.bin_name }}" \
+            -format UDRO -nospotlight \
+            -srcowners off -noanyowners \
+            "${{ needs.meta.outputs.bin_name }}.dmg"
           xcrun stapler staple "${{ needs.meta.outputs.bin_name }}.dmg"
       - name: Upload notarized workflow package
         uses: actions/upload-artifact@v3
