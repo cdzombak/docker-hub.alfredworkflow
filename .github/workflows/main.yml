@@ -106,6 +106,7 @@ jobs:
         env:
           DEVID_SIGNING_CERT_BASE64: ${{ secrets.DEVID_SIGNING_CERT }}
           DEVID_SIGNING_CERT_PASS: ${{ secrets.DEVID_SIGNING_CERT_PASS }}
+          DEVID_SIGNING_CERT_ID: E96F32F4C62CDE44BD2F9F7040F8D3C9EBEDD5B4
           KEYCHAIN_PASS: ${{ secrets.KEYCHAIN_PASS }}
         run: |
           echo "$DEVID_SIGNING_CERT_BASE64" | base64 --decode > certificate.p12
@@ -114,10 +115,22 @@ jobs:
           security unlock-keychain -p "$KEYCHAIN_PASS" build.keychain
           security import certificate.p12 -k build.keychain -P "$DEVID_SIGNING_CERT_PASS" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASS" build.keychain
-          /usr/bin/codesign --force -s E96F32F4C62CDE44BD2F9F7040F8D3C9EBEDD5B4 ./dockerhub -v
-      - name: Build workflow package
+          /usr/bin/codesign --force --timestamp --options=runtime -s "$DEVID_SIGNING_CERT_ID" ./dockerhub -v
+      - name: Build workflow
         run: make package
-      - name: Upload workflow package
+      - name: Notarize workflow
+        working-directory: out
+        env:
+          NOTARIZATION_APPLE_ID: ${{ secrets.NOTARIZATION_APPLE_ID }}
+          NOTARIZATION_TEAM_ID: ${{ secrets.NOTARIZATION_TEAM_ID }}
+          NOTARIZATION_PASS: ${{ secrets.NOTARIZATION_PASS }}
+        run: |
+          xcrun notarytool store-credentials "notarytool-profile" \
+            --apple-id "$NOTARIZATION_APPLE_ID" \
+            --team-id "$NOTARIZATION_TEAM_ID" \
+            --password "$NOTARIZATION_PASS"
+          xcrun notarytool submit "${{ needs.meta.outputs.bin_name }}" --keychain-profile "notarytool-profile" --wait
+      - name: Upload notarized workflow package
         uses: actions/upload-artifact@v3
         with:
           name: ${{ needs.meta.outputs.bin_name }} package
