@@ -33,11 +33,8 @@ package: build ## Build and package the workflow for distribution
 	ln ./images/verified.png ./.pkg/verified.png
 	ln ./images/not-verified.png ./.pkg/not-verified.png
 	cp -v ./workflow/info.plist ./.pkg/info.plist
-	sed -i '' -e 's/__WORKFLOW_VERSION__/${BIN_VERSION}/g' ./.pkg/info.plist
-	pushd ./.pkg
-	zip -r workflow.zip *
-	mv -v workflow.zip ../out/docker-hub-${BIN_VERSION}.alfredworkflow
-	popd
+	sed -i '' -e 's/__WORKFLOW_VERSION__/${VERSION}/g' ./.pkg/info.plist
+	cd ./.pkg && zip -r workflow.zip * && mv -v workflow.zip ../out/docker-hub-${VERSION}.alfredworkflow
 
 .PHONY: lint
 lint: ## Lint all source files in this repository (requires nektos/act: https://nektosact.com)
